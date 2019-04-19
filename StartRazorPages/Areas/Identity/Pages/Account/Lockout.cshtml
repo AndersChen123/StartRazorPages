@@ -1,0 +1,12 @@
+﻿@page
+@model StartRazorPages.Areas.Identity.Pages.Account.LockoutModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+
+    ViewData["Title"] = "Locked out";
+}
+
+<header>
+    <h1 class="text-danger">@ViewData["Title"]</h1>
+    <p class="text-danger">This account has been locked out, please try again later.</p>
+</header>
