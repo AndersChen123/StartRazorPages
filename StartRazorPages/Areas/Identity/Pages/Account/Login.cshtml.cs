@@ -67,7 +67,7 @@ namespace StartRazorPages.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/Dashboard");
 
             if (ModelState.IsValid)
             {

@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using StartRazorPages.Infrastructure.Services;
 using StartRazorPages.Domain;
 using StartRazorPages.Application.Interfaces;
+using Microsoft.Extensions.Hosting;
 
 namespace StartRazorPages
 {
@@ -62,8 +63,18 @@ namespace StartRazorPages
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+
+            services.AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<ApplicationRole>()
+                .AddRoleManager<RoleManager<ApplicationRole>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            });
 
             services.AddDbContext<CustomerDbContext>(); // (options => options.UseSqlServer(Configuration.GetConnectionString("CustomerConnection")));
 
@@ -78,14 +89,11 @@ namespace StartRazorPages
                 options.SlidingExpiration = true;
             });
 
-            services.AddMvc().AddRazorPagesOptions(options =>
-            {
-                options.AllowAreas = true;
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -103,9 +111,14 @@ namespace StartRazorPages
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+            });
 
             _ = DataSeed.InitializeAsync(app.ApplicationServices);
         }
